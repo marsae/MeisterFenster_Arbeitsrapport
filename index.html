@@ -43,7 +43,7 @@
   .rapport-header img {
     height: 60px;
     width: auto;
-    max-width: 280px;
+    max-width: 280px; /* breiteres Logo */
     background: #eee; /* Platzhalter, falls kein Logo */
   }
 
@@ -125,7 +125,7 @@
     min-height: 90px;
   }
 
-  /* Datum-Feld: wie andere Inputs, Browser-Styling minimieren */
+  /* Datum-Feld */
   .field input[type="date"] {
     -webkit-appearance: none;
     -moz-appearance: textfield;
@@ -174,6 +174,7 @@
   .stunden-table td {
     border: 1px solid #e0e0e0;
     padding: 6px 8px;
+    vertical-align: middle;
   }
 
   .stunden-table td input {
@@ -209,6 +210,20 @@
     color: #4db848;
   }
 
+  .remove-row-btn {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .remove-row-btn:hover {
+    border-color: #e44;
+    color: #e44;
+  }
+
   /* MATERIAL */
   .material-table {
     width: 100%;
@@ -231,6 +246,7 @@
   .material-table td {
     border: 1px solid #e0e0e0;
     padding: 6px 8px;
+    vertical-align: middle;
   }
 
   .material-table td input {
@@ -387,29 +403,24 @@
 
   .btn-primary:hover { background: #3da038; }
 
-  /* ==== TABLET (z.B. iPad hochkant) ==== */
+  /* ==== TABLET ==== */
   @media (min-width: 601px) and (max-width: 900px) {
-
     .card {
       max-width: 700px;
     }
-
     .grid-3 {
-      grid-template-columns: 1fr 1fr; /* statt 3 Spalten, nur 2 */
+      grid-template-columns: 1fr 1fr;
     }
-
     .grid-2 {
       grid-template-columns: 1fr 1fr;
     }
-
     .section {
       margin-bottom: 22px;
     }
   }
 
-  /* ==== MOBILE (Smartphones & kleine Tablets) ==== */
+  /* ==== MOBILE ==== */
   @media (max-width: 600px) {
-
     body {
       font-size: 16px;
     }
@@ -433,7 +444,7 @@
 
     .rapport-header img {
       height: 40px;
-      max-width: 120px;
+      max-width: 160px;
     }
 
     .rapport-title {
@@ -504,6 +515,7 @@
     .add-row-btn { display: none; }
     .clear-sig { display: none; }
     .foto-upload-area > p { display: none; }
+    .remove-row-btn { display: none; }
 
     .field input,
     .field textarea,
@@ -595,10 +607,11 @@
       <table class="stunden-table">
         <thead>
           <tr>
-            <th style="width:35%">Mitarbeiter</th>
-            <th style="width:20%">Von</th>
-            <th style="width:20%">Bis</th>
-            <th style="width:25%">Total Stunden</th>
+            <th style="width:30%">Mitarbeiter</th>
+            <th style="width:18%">Von</th>
+            <th style="width:18%">Bis</th>
+            <th style="width:24%">Total Stunden</th>
+            <th style="width:10%">Aktion</th>
           </tr>
         </thead>
         <tbody id="stunden-tbody">
@@ -607,6 +620,7 @@
             <td><input type="time"></td>
             <td><input type="time"></td>
             <td><input type="text" placeholder="z.B. 8.5 h"></td>
+            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">–</button></td>
           </tr>
         </tbody>
       </table>
@@ -619,9 +633,10 @@
       <table class="material-table">
         <thead>
           <tr>
-            <th style="width:50%">Bezeichnung</th>
+            <th style="width:46%">Bezeichnung</th>
             <th style="width:20%">Menge</th>
-            <th style="width:30%">Einheit / Bemerkung</th>
+            <th style="width:24%">Einheit / Bemerkung</th>
+            <th style="width:10%">Aktion</th>
           </tr>
         </thead>
         <tbody id="material-tbody">
@@ -629,11 +644,13 @@
             <td><input type="text" placeholder="Material / Artikel"></td>
             <td><input type="number" placeholder="0"></td>
             <td><input type="text" placeholder="Stk / m / kg …"></td>
+            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">–</button></td>
           </tr>
           <tr>
             <td><input type="text" placeholder="Material / Artikel"></td>
             <td><input type="number" placeholder="0"></td>
             <td><input type="text" placeholder="Stk / m / kg …"></td>
+            <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">–</button></td>
           </tr>
         </tbody>
       </table>
@@ -697,7 +714,7 @@
 </div><!-- /screen-only -->
 
 <script>
-  // Canvas-Größen initialisieren (z.B. fixe Breite/Höhe)
+  // Canvas-Größen initialisieren
   document.addEventListener('DOMContentLoaded', () => {
     ['sig-monteur', 'sig-kunde'].forEach(id => {
       const canvas = document.getElementById(id);
@@ -708,7 +725,7 @@
     });
   });
 
-  // ---- Signatur-Zeichnen (Maus + Touch) ----
+  // Signatur-Zeichnen (Maus + Touch)
   document.addEventListener('DOMContentLoaded', () => {
     const canvases = ['sig-monteur', 'sig-kunde'];
 
@@ -727,7 +744,6 @@
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      // Position relativ zum Canvas berechnen
       function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         let x, y;
@@ -767,13 +783,11 @@
         drawing = false;
       }
 
-      // Maus-Events (Desktop)
       canvas.addEventListener('mousedown', startDraw);
       canvas.addEventListener('mousemove', draw);
       canvas.addEventListener('mouseup', endDraw);
       canvas.addEventListener('mouseleave', endDraw);
 
-      // Touch-Events (iPhone/iPad)
       canvas.addEventListener('touchstart', startDraw, { passive: false });
       canvas.addEventListener('touchmove', draw, { passive: false });
       canvas.addEventListener('touchend', endDraw, { passive: false });
@@ -781,7 +795,13 @@
     });
   });
 
-  // ---- Arbeitsstunden-Zeile hinzufügen ----
+  // Zeile entfernen (Stunden & Material)
+  function removeRow(button) {
+    const tr = button.closest('tr');
+    if (tr) tr.remove();
+  }
+
+  // Arbeitsstunden-Zeile hinzufügen
   function addStundenRow() {
     const tbody = document.getElementById('stunden-tbody');
     if (!tbody) return;
@@ -791,11 +811,12 @@
       <td><input type="time"></td>
       <td><input type="time"></td>
       <td><input type="text" placeholder="z.B. 8.5 h"></td>
+      <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">–</button></td>
     `;
     tbody.appendChild(tr);
   }
 
-  // ---- Material-Zeile hinzufügen ----
+  // Material-Zeile hinzufügen
   function addMaterialRow() {
     const tbody = document.getElementById('material-tbody');
     if (!tbody) return;
@@ -804,11 +825,12 @@
       <td><input type="text" placeholder="Material / Artikel"></td>
       <td><input type="number" placeholder="0"></td>
       <td><input type="text" placeholder="Stk / m / kg …"></td>
+      <td><button type="button" class="remove-row-btn" onclick="removeRow(this)">–</button></td>
     `;
     tbody.appendChild(tr);
   }
 
-  // ---- Fotos verarbeiten & Vorschau anzeigen ----
+  // Fotos verarbeiten & Vorschau anzeigen
   function handleFotos(event) {
     const files = event.target.files;
     const preview = document.getElementById('foto-preview');
@@ -831,7 +853,7 @@
     });
   }
 
-  // ---- Signatur-Canvas leeren ----
+  // Signatur-Canvas leeren
   function clearSig(canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
@@ -840,7 +862,7 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  // ---- Formular zurücksetzen ----
+  // Formular zurücksetzen
   function resetForm() {
     document.querySelectorAll('input, textarea').forEach(el => {
       const type = el.type;
