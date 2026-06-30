@@ -533,7 +533,7 @@
 
   <!-- HEADER -->
   <div class="rapport-header">
-    <img id="logo-img" src="" alt="Meister Fenster AG Logo">
+    <img id="logo-img" src="LOGO.png" alt="Meister Fenster AG Logo">
     <div class="rapport-title">
       <h1>Montagerapport</h1>
       <div class="subtitle">Meister Fenster AG · Matzendorf</div>
@@ -697,24 +697,16 @@
 </div><!-- /screen-only -->
 
 <script>
-  // ---- LOGO (Base64) setzen ----
-  const LOGO_B64 = "hierlogopfad"; // hier deine echte Base64-Grafik einsetzen
-
   document.addEventListener('DOMContentLoaded', () => {
-    const logoImg = document.getElementById('logo-img');
-    if (logoImg && LOGO_B64) {
-      logoImg.src = 'data:image/png;base64,' + LOGO_B64;
+  // Canvas-Größen initialisieren (z.B. fixe Breite/Höhe)
+  ['sig-monteur', 'sig-kunde'].forEach(id => {
+    const canvas = document.getElementById(id);
+    if (canvas) {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
     }
-
-    // Canvas-Größen initialisieren (z.B. fixe Breite/Höhe)
-    ['sig-monteur', 'sig-kunde'].forEach(id => {
-      const canvas = document.getElementById(id);
-      if (canvas) {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-      }
-    });
   });
+});
 
   // ---- Arbeitsstunden-Zeile hinzufügen ----
   function addStundenRow() {
